@@ -95,10 +95,12 @@ function startGame() {
     generateBoard();
 }
 
+/* 📌 FIXED FUNCTION: CATEGORIES DISPLAY IN COLUMNS */
 function generateBoard() {
     const board = document.getElementById("jeopardy-board");
     board.innerHTML = '';
 
+    // Create category headers
     Object.keys(categories).forEach(category => {
         let header = document.createElement("div");
         header.className = "category";
@@ -106,6 +108,7 @@ function generateBoard() {
         board.appendChild(header);
     });
 
+    // Create question buttons
     for (let points of [100, 200, 300, 400, 500]) {
         Object.keys(categories).forEach(category => {
             let button = document.createElement("button");
@@ -115,4 +118,26 @@ function generateBoard() {
             board.appendChild(button);
         });
     }
+}
+
+/* ✅ FIXED: QUESTION DISPLAY FUNCTION */
+function showQuestion(category, points) {
+    currentQuestion = category;
+    currentPoints = points;
+
+    const jeopardyTheme = document.getElementById("jeopardy-theme");
+    jeopardyTheme.play();
+
+    document.getElementById("question-text").innerText = categories[category][points][0];
+    document.getElementById("popup").style.display = "block";
+}
+
+function showAnswer() {
+    document.getElementById("popup").style.display = "none";
+    document.getElementById("answer-text").innerText = categories[currentQuestion][currentPoints][1];
+    document.getElementById("answer-popup").style.display = "block";
+
+    const jeopardyTheme = document.getElementById("jeopardy-theme");
+    jeopardyTheme.pause();
+    jeopardyTheme.currentTime = 0;
 }
