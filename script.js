@@ -1,3 +1,12 @@
+let teams = {};
+let currentQuestion = null;
+let currentPoints = 0;
+let currentButton = null;
+
+document.getElementById("add-team").addEventListener("click", addTeam);
+document.getElementById("start-game").addEventListener("click", startGame);
+
+// Predefined sets of questions (cycling daily)
 const questionSets = [
     {
         "Ethical Principles": {
@@ -14,73 +23,37 @@ const questionSets = [
             400: ["Avoiding favoritism and personal bias in decision-making.", "Impartiality"],
             500: ["Using company resources for personal gain without authorization.", "Misappropriation"]
         },
-        "Corporate Ethics": {
-            100: ["The duty to act in the best interest of a company and its stakeholders.", "Corporate Responsibility"],
-            200: ["Fair and honest communication with investors and the public.", "Transparency"],
-            300: ["Policies that prevent workplace discrimination.", "Equal Opportunity"],
-            400: ["Avoiding manipulation of financial reports for personal gain.", "Accounting Ethics"],
-            500: ["Adhering to the highest moral and ethical standards.", "Integrity in Business"]
+        "Legal & Compliance": {
+            100: ["Falsifying documents or financial records for personal or business gain.", "Fraud"],
+            200: ["Laws that protect employees from discrimination based on race, gender, or religion.", "Equal Employment Opportunity (EEO) laws"],
+            300: ["Offering or accepting something of value to influence a business decision.", "Bribery"],
+            400: ["The requirement to disclose any conflicts of interest in professional dealings.", "Transparency"],
+            500: ["A set of company policies that outline acceptable workplace behavior and expectations.", "Code of Conduct"]
         },
-        "Digital Conduct": {
-            100: ["The duty to protect customer and employee digital data.", "Cybersecurity"],
-            200: ["Using work email responsibly and professionally.", "Email Etiquette"],
-            300: ["Not sharing private company information online.", "Data Privacy"],
-            400: ["The importance of keeping software and systems updated.", "Security Compliance"],
-            500: ["Avoiding personal use of work devices.", "Responsible Technology Use"]
+        "Professional Responsibilities": {
+            100: ["The expectation that professionals will continue to develop their skills and knowledge.", "Continuous learning"],
+            200: ["The obligation to report misconduct, even if it may have personal consequences.", "Duty to report"],
+            300: ["Avoiding giving or receiving these to prevent conflicts of interest.", "Gifts and favors"],
+            400: ["Following lawful instructions from supervisors unless they violate ethical standards.", "Ethical obedience"],
+            500: ["The responsibility of a leader to set a strong ethical example.", "Ethical leadership"]
         },
-        "Legal Responsibilities": {
-            100: ["The laws protecting employees from discrimination.", "EEO Laws"],
-            200: ["Bribery and illegal payments fall under this crime.", "Corruption"],
-            300: ["A whistleblower law protecting employees.", "Whistleblower Protection Act"],
-            400: ["Disclosing conflicts of interest in business.", "Transparency"],
-            500: ["Rules that businesses must follow to stay legal.", "Regulatory Compliance"]
-        }
-    },
-    {
-        "Corporate Policies": {
-            100: ["The rules that dictate employee conduct.", "Company Policy"],
-            200: ["Actions taken to address unethical behavior.", "Disciplinary Measures"],
-            300: ["The standard of expected honesty.", "Integrity"],
-            400: ["Encouraging employees to report concerns.", "Whistleblower Protection"],
-            500: ["A structured approach to compliance.", "Regulatory Framework"]
-        },
-        "Financial Ethics": {
-            100: ["Handling money and assets responsibly.", "Financial Integrity"],
-            200: ["Avoiding fraud and money laundering.", "Ethical Banking"],
-            300: ["Ensuring fairness in stock trading.", "Insider Trading Laws"],
-            400: ["Reporting financial misconduct.", "Forensic Accounting"],
-            500: ["The importance of honest tax reporting.", "Tax Ethics"]
-        },
-        "Corporate Social Responsibility": {
-            100: ["Businesses helping communities.", "Philanthropy"],
-            200: ["Minimizing harm to the environment.", "Sustainability"],
-            300: ["Companies supporting diversity and inclusion.", "DEI Initiatives"],
-            400: ["Companies giving employees fair wages.", "Fair Compensation"],
-            500: ["The idea that businesses must act ethically.", "Corporate Ethics"]
-        },
-        "Technology Ethics": {
-            100: ["The fair use of AI and automation.", "AI Ethics"],
-            200: ["Avoiding biased algorithms.", "Tech Fairness"],
-            300: ["Respecting user privacy in software.", "Privacy Laws"],
-            400: ["Not misusing employee monitoring software.", "Workplace Surveillance Ethics"],
-            500: ["Developing technology for the public good.", "Ethical Innovation"]
-        },
-        "Leadership Ethics": {
-            100: ["A leader's moral duty to set an example.", "Ethical Leadership"],
-            200: ["Being honest in business communications.", "Truthfulness"],
-            300: ["Empowering employees ethically.", "Fair Delegation"],
-            400: ["Making ethical decisions under pressure.", "Moral Courage"],
-            500: ["Correcting wrongs within an organization.", "Restorative Leadership"]
+        "Digital & Online Conduct": {
+            100: ["Using company technology for personal, illegal, or inappropriate purposes.", "Misuse of company resources"],
+            200: ["The duty to protect sensitive client or company data.", "Data privacy"],
+            300: ["Unauthorized sharing or leaking of confidential company information.", "Information breach"],
+            400: ["Posting false or damaging statements about a company or colleague online.", "Defamation"],
+            500: ["The principle that encourages professionals to think carefully before posting online.", "Responsible online conduct"]
         }
     }
 ];
 
+// Function to get a new question set each day
 function getDailyQuestionSet() {
     const today = new Date().getDate();
-    const index = today % questionSets.length;
-    return questionSets[index];
+    return questionSets[today % questionSets.length]; // Cycle through question sets daily
 }
 
+// Updates the daily questions
 function updateDailyQuestions() {
     const lastUpdated = localStorage.getItem("lastUpdated");
     const today = new Date().toDateString();
@@ -94,35 +67,128 @@ function updateDailyQuestions() {
 updateDailyQuestions();
 const categories = JSON.parse(localStorage.getItem("dailyQuestions"));
 
+// Function to add a new team input
+function addTeam() {
+    const teamInputs = document.getElementById("team-inputs");
+    const input = document.createElement("input");
+    input.type = "text";
+    input.placeholder = "Team Name";
+    teamInputs.appendChild(input);
+}
+
+// Function to start the game
+function startGame() {
+    const teamInputs = document.querySelectorAll("#team-inputs input");
+    if (teamInputs.length === 0) return;
+
+    teams = {};
+    const teamSelect = document.getElementById("team-select");
+    teamSelect.innerHTML = "";
+    document.getElementById("scores").innerHTML = "";
+
+    teamInputs.forEach(input => {
+        if (input.value.trim() !== "") {
+            const name = input.value.trim();
+            teams[name] = 0;
+
+            const scoreDiv = document.createElement("div");
+            scoreDiv.className = "team";
+            scoreDiv.id = `team-${name}`;
+            scoreDiv.innerText = `${name}: $0`;
+            document.getElementById("scores").appendChild(scoreDiv);
+
+            const option = document.createElement("option");
+            option.value = name;
+            option.innerText = name;
+            teamSelect.appendChild(option);
+        }
+    });
+
+    document.getElementById("setup").style.display = "none";
+    document.getElementById("game").style.display = "block";
+    generateBoard();
+}
+
+// Generate Jeopardy board with columns
 function generateBoard() {
     const board = document.getElementById("jeopardy-board");
     board.innerHTML = '';
 
+    // Create row for category headers
+    const headerRow = document.createElement("div");
+    headerRow.className = "row";
+    
     Object.keys(categories).forEach(category => {
         let header = document.createElement("div");
         header.className = "category";
         header.innerText = category;
-        board.appendChild(header);
+        headerRow.appendChild(header);
     });
+    board.appendChild(headerRow);
 
+    // Create question rows
     for (let points of [100, 200, 300, 400, 500]) {
+        const row = document.createElement("div");
+        row.className = "row";
+        
         Object.keys(categories).forEach(category => {
             let button = document.createElement("button");
             button.className = "question";
             button.innerText = `$${points}`;
-            button.onclick = () => showQuestion(category, points);
-            board.appendChild(button);
+            button.setAttribute("data-category", category);
+            button.setAttribute("data-points", points);
+            button.onclick = showQuestion;
+            row.appendChild(button);
         });
+
+        board.appendChild(row);
     }
 }
 
-function showQuestion(category, points) {
+// Show question when button is clicked
+function showQuestion(event) {
+    currentButton = event.target;
+    const category = currentButton.getAttribute("data-category");
+    const points = parseInt(currentButton.getAttribute("data-points"));
+
+    currentQuestion = category;
+    currentPoints = points;
+
+    // Play Jeopardy theme
+    const jeopardyTheme = document.getElementById("jeopardy-theme");
+    jeopardyTheme.play();
+
     document.getElementById("question-text").innerText = categories[category][points][0];
     document.getElementById("popup").style.display = "block";
 }
 
+// Show answer
 function showAnswer() {
     document.getElementById("popup").style.display = "none";
     document.getElementById("answer-text").innerText = categories[currentQuestion][currentPoints][1];
     document.getElementById("answer-popup").style.display = "block";
+
+    // Stop Jeopardy theme
+    const jeopardyTheme = document.getElementById("jeopardy-theme");
+    jeopardyTheme.pause();
+    jeopardyTheme.currentTime = 0;
+}
+
+// Update score
+function updateScore(correct) {
+    const team = document.getElementById("team-select").value;
+    if (team) {
+        teams[team] += correct ? currentPoints : -currentPoints;
+        document.getElementById(`team-${team}`).innerText = `${team}: $${teams[team]}`;
+    }
+
+    // Close popups
+    document.getElementById("answer-popup").style.display = "none";
+
+    // Disable button after it is answered
+    if (currentButton) {
+        currentButton.disabled = true;
+        currentButton.style.backgroundColor = "#222";
+        currentButton.style.cursor = "not-allowed";
+    }
 }
