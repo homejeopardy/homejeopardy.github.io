@@ -50,16 +50,12 @@ h1 {
     font-weight: bold;
     border: 2px solid white;
     cursor: pointer;
-    color: white; /* Make the text color white */
+    color: white;
 }
 
 .question:disabled {
     background-color: #222;
     cursor: not-allowed;
-}
-
-.question {
-    color: white; /* Ensures the question text is white */
 }
 
 .popup {
@@ -85,13 +81,7 @@ h1 {
     font-family: 'Press Start 2P', sans-serif;
 }
 
-#question-text {
-    font-family: 'Press Start 2P', sans-serif;
-    font-size: 1.5em;
-    color: #0000CC;
-}
-
-#answer-text {
+#question-text, #answer-text {
     font-family: 'Press Start 2P', sans-serif;
     font-size: 1.5em;
     color: #0000CC;
