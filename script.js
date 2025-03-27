@@ -13,22 +13,64 @@ const questionSets = [
             300: ["Reporting unethical behavior or policy violations.", "Whistleblowing"],
             400: ["Avoiding favoritism and personal bias in decision-making.", "Impartiality"],
             500: ["Using company resources for personal gain without authorization.", "Misappropriation"]
+        },
+        "Corporate Ethics": {
+            100: ["The duty to act in the best interest of a company and its stakeholders.", "Corporate Responsibility"],
+            200: ["Fair and honest communication with investors and the public.", "Transparency"],
+            300: ["Policies that prevent workplace discrimination.", "Equal Opportunity"],
+            400: ["Avoiding manipulation of financial reports for personal gain.", "Accounting Ethics"],
+            500: ["Adhering to the highest moral and ethical standards.", "Integrity in Business"]
+        },
+        "Digital Conduct": {
+            100: ["The duty to protect customer and employee digital data.", "Cybersecurity"],
+            200: ["Using work email responsibly and professionally.", "Email Etiquette"],
+            300: ["Not sharing private company information online.", "Data Privacy"],
+            400: ["The importance of keeping software and systems updated.", "Security Compliance"],
+            500: ["Avoiding personal use of work devices.", "Responsible Technology Use"]
+        },
+        "Legal Responsibilities": {
+            100: ["The laws protecting employees from discrimination.", "EEO Laws"],
+            200: ["Bribery and illegal payments fall under this crime.", "Corruption"],
+            300: ["A whistleblower law protecting employees.", "Whistleblower Protection Act"],
+            400: ["Disclosing conflicts of interest in business.", "Transparency"],
+            500: ["Rules that businesses must follow to stay legal.", "Regulatory Compliance"]
         }
     },
     {
-        "Business Ethics": {
-            100: ["The moral principles that guide a person's behavior in business.", "Ethics"],
-            200: ["Fair treatment of all employees and stakeholders.", "Equity"],
-            300: ["Keeping promises and commitments.", "Trustworthiness"],
-            400: ["The ethical principle of not harming others.", "Non-maleficence"],
-            500: ["Being answerable for one's actions.", "Accountability"]
-        },
         "Corporate Policies": {
-            100: ["The rules that dictate employee conduct in a company.", "Company Policy"],
-            200: ["Actions taken to address unethical behavior.", "Disciplinary measures"],
-            300: ["The standard of expected honesty in an organization.", "Integrity"],
-            400: ["Encouraging employees to voice concerns safely.", "Whistleblower protection"],
-            500: ["A structured approach to ensuring compliance.", "Regulatory framework"]
+            100: ["The rules that dictate employee conduct.", "Company Policy"],
+            200: ["Actions taken to address unethical behavior.", "Disciplinary Measures"],
+            300: ["The standard of expected honesty.", "Integrity"],
+            400: ["Encouraging employees to report concerns.", "Whistleblower Protection"],
+            500: ["A structured approach to compliance.", "Regulatory Framework"]
+        },
+        "Financial Ethics": {
+            100: ["Handling money and assets responsibly.", "Financial Integrity"],
+            200: ["Avoiding fraud and money laundering.", "Ethical Banking"],
+            300: ["Ensuring fairness in stock trading.", "Insider Trading Laws"],
+            400: ["Reporting financial misconduct.", "Forensic Accounting"],
+            500: ["The importance of honest tax reporting.", "Tax Ethics"]
+        },
+        "Corporate Social Responsibility": {
+            100: ["Businesses helping communities.", "Philanthropy"],
+            200: ["Minimizing harm to the environment.", "Sustainability"],
+            300: ["Companies supporting diversity and inclusion.", "DEI Initiatives"],
+            400: ["Companies giving employees fair wages.", "Fair Compensation"],
+            500: ["The idea that businesses must act ethically.", "Corporate Ethics"]
+        },
+        "Technology Ethics": {
+            100: ["The fair use of AI and automation.", "AI Ethics"],
+            200: ["Avoiding biased algorithms.", "Tech Fairness"],
+            300: ["Respecting user privacy in software.", "Privacy Laws"],
+            400: ["Not misusing employee monitoring software.", "Workplace Surveillance Ethics"],
+            500: ["Developing technology for the public good.", "Ethical Innovation"]
+        },
+        "Leadership Ethics": {
+            100: ["A leader's moral duty to set an example.", "Ethical Leadership"],
+            200: ["Being honest in business communications.", "Truthfulness"],
+            300: ["Empowering employees ethically.", "Fair Delegation"],
+            400: ["Making ethical decisions under pressure.", "Moral Courage"],
+            500: ["Correcting wrongs within an organization.", "Restorative Leadership"]
         }
     }
 ];
@@ -52,55 +94,10 @@ function updateDailyQuestions() {
 updateDailyQuestions();
 const categories = JSON.parse(localStorage.getItem("dailyQuestions"));
 
-let teams = {};
-let currentQuestion = null;
-let currentPoints = 0;
-let currentButton = null;
-
-document.getElementById("add-team").addEventListener("click", addTeam);
-document.getElementById("start-game").addEventListener("click", startGame);
-
-function addTeam() {
-    const teamInputs = document.getElementById("team-inputs");
-    const input = document.createElement("input");
-    input.type = "text";
-    input.placeholder = "Team Name";
-    teamInputs.appendChild(input);
-}
-
-function startGame() {
-    teams = {};
-    document.getElementById("scores").innerHTML = "";
-    document.getElementById("team-select").innerHTML = "";
-
-    document.querySelectorAll("#team-inputs input").forEach(input => {
-        if (input.value.trim()) {
-            let name = input.value.trim();
-            teams[name] = 0;
-
-            let scoreDiv = document.createElement("div");
-            scoreDiv.className = "team";
-            scoreDiv.innerText = `${name}: $0`;
-            document.getElementById("scores").appendChild(scoreDiv);
-
-            let option = document.createElement("option");
-            option.value = name;
-            option.innerText = name;
-            document.getElementById("team-select").appendChild(option);
-        }
-    });
-
-    document.getElementById("setup").style.display = "none";
-    document.getElementById("game").style.display = "block";
-    generateBoard();
-}
-
-/* 📌 FIXED FUNCTION: CATEGORIES DISPLAY IN COLUMNS */
 function generateBoard() {
     const board = document.getElementById("jeopardy-board");
     board.innerHTML = '';
 
-    // Create category headers
     Object.keys(categories).forEach(category => {
         let header = document.createElement("div");
         header.className = "category";
@@ -108,7 +105,6 @@ function generateBoard() {
         board.appendChild(header);
     });
 
-    // Create question buttons
     for (let points of [100, 200, 300, 400, 500]) {
         Object.keys(categories).forEach(category => {
             let button = document.createElement("button");
@@ -120,14 +116,7 @@ function generateBoard() {
     }
 }
 
-/* ✅ FIXED: QUESTION DISPLAY FUNCTION */
 function showQuestion(category, points) {
-    currentQuestion = category;
-    currentPoints = points;
-
-    const jeopardyTheme = document.getElementById("jeopardy-theme");
-    jeopardyTheme.play();
-
     document.getElementById("question-text").innerText = categories[category][points][0];
     document.getElementById("popup").style.display = "block";
 }
@@ -136,8 +125,4 @@ function showAnswer() {
     document.getElementById("popup").style.display = "none";
     document.getElementById("answer-text").innerText = categories[currentQuestion][currentPoints][1];
     document.getElementById("answer-popup").style.display = "block";
-
-    const jeopardyTheme = document.getElementById("jeopardy-theme");
-    jeopardyTheme.pause();
-    jeopardyTheme.currentTime = 0;
 }
