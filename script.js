@@ -6,10 +6,7 @@ let currentQuestion = null;
 let currentPoints = 0;
 let currentButton = null;
 
-// Jeopardy theme sound
-const jeopardyTheme = document.getElementById("jeopardy-theme");
-
-// Categories & Questions
+// Categories and questions
 const categories = {
     "Business Ethics": {
         100: ["Acting with honesty in business.", "Integrity"],
@@ -48,7 +45,7 @@ const categories = {
     }
 };
 
-// Add new team input
+// Function to add a new team input
 function addTeam() {
     const teamInputs = document.getElementById("team-inputs");
     const input = document.createElement("input");
@@ -57,7 +54,7 @@ function addTeam() {
     teamInputs.appendChild(input);
 }
 
-// Start game
+// Function to start the game
 function startGame() {
     const teamInputs = document.querySelectorAll("#team-inputs input");
     if (teamInputs.length === 0) return;
@@ -89,88 +86,18 @@ function startGame() {
     generateBoard();
 }
 
-// Generate Jeopardy Board
+// Generate Jeopardy board correctly
 function generateBoard() {
     const board = document.getElementById("jeopardy-board");
     board.innerHTML = '';
 
-    // Create category headers
-    const categoryRow = document.createElement("div");
-    categoryRow.className = "category-row";
-    board.appendChild(categoryRow);
+    // Set proper grid layout
+    board.style.display = "grid";
+    board.style.gridTemplateColumns = "repeat(5, 1fr)";
+    board.style.gridTemplateRows = "auto repeat(5, 1fr)";
+    board.style.gap = "5px";
 
+    // First row: Category headers
     Object.keys(categories).forEach(category => {
         let header = document.createElement("div");
         header.className = "category";
-        header.innerText = category;
-        categoryRow.appendChild(header);
-    });
-
-    // Create question rows
-    for (let points of [100, 200, 300, 400, 500]) {
-        const row = document.createElement("div");
-        row.className = "question-row";
-        board.appendChild(row);
-
-        Object.keys(categories).forEach(category => {
-            let button = document.createElement("button");
-            button.className = "question";
-            button.innerText = `$${points}`;
-            button.setAttribute("data-category", category);
-            button.setAttribute("data-points", points);
-            button.onclick = showQuestion;
-            row.appendChild(button);
-        });
-    }
-}
-
-// Play Jeopardy theme
-function playJeopardyTheme() {
-    if (jeopardyTheme.paused) {
-        jeopardyTheme.currentTime = 0;
-        jeopardyTheme.play().catch(error => console.log("Audio play blocked:", error));
-    }
-}
-
-// Show Question Popup
-function showQuestion(event) {
-    currentButton = event.target;
-    const category = currentButton.getAttribute("data-category");
-    const points = parseInt(currentButton.getAttribute("data-points"));
-
-    currentQuestion = category;
-    currentPoints = points;
-
-    playJeopardyTheme(); // Play theme when a question appears
-
-    document.getElementById("question-text").innerText = categories[category][points][0];
-    document.getElementById("popup").style.display = "block";
-}
-
-// Show Answer Popup
-function showAnswer() {
-    document.getElementById("popup").style.display = "none";
-    document.getElementById("answer-text").innerText = categories[currentQuestion][currentPoints][1];
-    document.getElementById("answer-popup").style.display = "block";
-
-    jeopardyTheme.pause(); // Stop music when answer appears
-    jeopardyTheme.currentTime = 0;
-}
-
-// Update Score
-function updateScore(correct) {
-    const team = document.getElementById("team-select").value;
-    if (team) {
-        teams[team] += correct ? currentPoints : -currentPoints;
-        document.getElementById(`team-${team}`).innerText = `${team}: $${teams[team]}`;
-    }
-
-    document.getElementById("answer-popup").style.display = "none";
-
-    // Disable answered button
-    if (currentButton) {
-        currentButton.disabled = true;
-        currentButton.style.backgroundColor = "#222";
-        currentButton.style.cursor = "not-allowed";
-    }
-}
