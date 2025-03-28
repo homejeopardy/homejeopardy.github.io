@@ -6,6 +6,10 @@ let currentQuestion = null;
 let currentPoints = 0;
 let currentButton = null;
 
+// Jeopardy theme sound
+const jeopardyTheme = document.getElementById("jeopardy-theme");
+
+// Categories & Questions
 const categories = {
     "Business Ethics": {
         100: ["Acting with honesty in business.", "Integrity"],
@@ -44,7 +48,7 @@ const categories = {
     }
 };
 
-// Function to add a new team input
+// Add new team input
 function addTeam() {
     const teamInputs = document.getElementById("team-inputs");
     const input = document.createElement("input");
@@ -53,7 +57,7 @@ function addTeam() {
     teamInputs.appendChild(input);
 }
 
-// Function to start the game
+// Start game
 function startGame() {
     const teamInputs = document.querySelectorAll("#team-inputs input");
     if (teamInputs.length === 0) return;
@@ -85,21 +89,29 @@ function startGame() {
     generateBoard();
 }
 
-// Generate Jeopardy board with correct layout
+// Generate Jeopardy Board
 function generateBoard() {
     const board = document.getElementById("jeopardy-board");
     board.innerHTML = '';
 
     // Create category headers
+    const categoryRow = document.createElement("div");
+    categoryRow.className = "category-row";
+    board.appendChild(categoryRow);
+
     Object.keys(categories).forEach(category => {
         let header = document.createElement("div");
         header.className = "category";
         header.innerText = category;
-        board.appendChild(header);
+        categoryRow.appendChild(header);
     });
 
-    // Create question buttons
+    // Create question rows
     for (let points of [100, 200, 300, 400, 500]) {
+        const row = document.createElement("div");
+        row.className = "question-row";
+        board.appendChild(row);
+
         Object.keys(categories).forEach(category => {
             let button = document.createElement("button");
             button.className = "question";
@@ -107,12 +119,20 @@ function generateBoard() {
             button.setAttribute("data-category", category);
             button.setAttribute("data-points", points);
             button.onclick = showQuestion;
-            board.appendChild(button);
+            row.appendChild(button);
         });
     }
 }
 
-// Show question popup
+// Play Jeopardy theme
+function playJeopardyTheme() {
+    if (jeopardyTheme.paused) {
+        jeopardyTheme.currentTime = 0;
+        jeopardyTheme.play().catch(error => console.log("Audio play blocked:", error));
+    }
+}
+
+// Show Question Popup
 function showQuestion(event) {
     currentButton = event.target;
     const category = currentButton.getAttribute("data-category");
@@ -121,18 +141,23 @@ function showQuestion(event) {
     currentQuestion = category;
     currentPoints = points;
 
+    playJeopardyTheme(); // Play theme when a question appears
+
     document.getElementById("question-text").innerText = categories[category][points][0];
     document.getElementById("popup").style.display = "block";
 }
 
-// Show answer
+// Show Answer Popup
 function showAnswer() {
     document.getElementById("popup").style.display = "none";
     document.getElementById("answer-text").innerText = categories[currentQuestion][currentPoints][1];
     document.getElementById("answer-popup").style.display = "block";
+
+    jeopardyTheme.pause(); // Stop music when answer appears
+    jeopardyTheme.currentTime = 0;
 }
 
-// Update score
+// Update Score
 function updateScore(correct) {
     const team = document.getElementById("team-select").value;
     if (team) {
@@ -141,6 +166,11 @@ function updateScore(correct) {
     }
 
     document.getElementById("answer-popup").style.display = "none";
-    currentButton.disabled = true;
-    currentButton.style.backgroundColor = "#222";
+
+    // Disable answered button
+    if (currentButton) {
+        currentButton.disabled = true;
+        currentButton.style.backgroundColor = "#222";
+        currentButton.style.cursor = "not-allowed";
+    }
 }
