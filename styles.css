@@ -6,7 +6,7 @@ body {
     color: white;
     text-align: center;
     margin: 0;
-    padding: 0;
+    padding: 20px;
 }
 
 h1 {
@@ -15,7 +15,7 @@ h1 {
     margin-bottom: 20px;
 }
 
-/* SCOREBOARD */
+/* Scoreboard */
 .scores {
     display: flex;
     justify-content: center;
@@ -28,21 +28,20 @@ h1 {
     padding: 10px;
     border: 2px solid white;
     font-size: 1.2em;
-    min-width: 120px;
-    text-align: center;
 }
 
-/* JEOPARDY BOARD */
+/* Jeopardy Board */
 #jeopardy-board {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    grid-gap: 5px;
+    grid-template-columns: repeat(5, 1fr); /* 5 columns */
+    grid-template-rows: auto repeat(5, 1fr); /* 1 row for categories + 5 rows for questions */
+    gap: 5px;
     max-width: 900px;
     margin: auto;
     text-align: center;
 }
 
-/* CATEGORY HEADERS */
+/* Category Headers */
 .category {
     background-color: #0000CC;
     padding: 10px;
@@ -52,7 +51,7 @@ h1 {
     text-align: center;
 }
 
-/* QUESTION BUTTONS */
+/* Question Buttons */
 .question {
     background-color: #000099;
     padding: 20px;
@@ -66,21 +65,15 @@ h1 {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background-color 0.2s ease-in-out;
 }
 
-/* Hover effect for question buttons */
-.question:hover {
-    background-color: #0000CC;
-}
-
-/* Disable answered questions */
+/* Disable Used Questions */
 .question:disabled {
     background-color: #222;
     cursor: not-allowed;
 }
 
-/* POPUP STYLES */
+/* Popup Windows */
 .popup {
     position: fixed;
     top: 50%;
@@ -91,49 +84,17 @@ h1 {
     padding: 20px;
     border-radius: 10px;
     display: none;
-    width: 50%;
-    max-width: 600px;
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
-    text-align: center;
 }
 
 .popup button {
-    margin: 10px;
+    margin: 5px;
     padding: 10px;
     font-size: 1em;
     cursor: pointer;
-    border: none;
-    background-color: #0000CC;
-    color: white;
-    font-weight: bold;
-    transition: background-color 0.2s ease-in-out;
 }
 
-.popup button:hover {
-    background-color: #000099;
-}
-
-/* QUESTION & ANSWER TEXT */
 #question-text, #answer-text {
     font-family: 'Press Start 2P', sans-serif;
     font-size: 1.5em;
     color: #0000CC;
-    margin-bottom: 20px;
-}
-
-/* GAME SETUP AREA */
-#setup {
-    margin: 20px;
-}
-
-#team-inputs input {
-    padding: 10px;
-    margin: 5px;
-    font-size: 1em;
-}
-
-#team-select {
-    padding: 10px;
-    font-size: 1em;
-    margin: 10px;
 }
