@@ -101,3 +101,53 @@ function generateBoard() {
     Object.keys(categories).forEach(category => {
         let header = document.createElement("div");
         header.className = "category";
+        header.innerText = category;
+        board.appendChild(header);
+    });
+
+    // Fill board with question buttons
+    for (let points of [100, 200, 300, 400, 500]) {
+        Object.keys(categories).forEach(category => {
+            let button = document.createElement("button");
+            button.className = "question";
+            button.innerText = `$${points}`;
+            button.setAttribute("data-category", category);
+            button.setAttribute("data-points", points);
+            button.onclick = showQuestion;
+            board.appendChild(button);
+        });
+    }
+}
+
+// Show question popup
+function showQuestion(event) {
+    currentButton = event.target;
+    const category = currentButton.getAttribute("data-category");
+    const points = parseInt(currentButton.getAttribute("data-points"));
+
+    currentQuestion = category;
+    currentPoints = points;
+
+    document.getElementById("question-text").innerText = categories[category][points][0];
+    document.getElementById("popup").style.display = "block";
+}
+
+// Show answer
+function showAnswer() {
+    document.getElementById("popup").style.display = "none";
+    document.getElementById("answer-text").innerText = categories[currentQuestion][currentPoints][1];
+    document.getElementById("answer-popup").style.display = "block";
+}
+
+// Update score
+function updateScore(correct) {
+    const team = document.getElementById("team-select").value;
+    if (team) {
+        teams[team] += correct ? currentPoints : -currentPoints;
+        document.getElementById(`team-${team}`).innerText = `${team}: $${teams[team]}`;
+    }
+
+    document.getElementById("answer-popup").style.display = "none";
+    currentButton.disabled = true;
+    currentButton.style.backgroundColor = "#222";
+}
